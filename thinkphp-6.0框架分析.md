@@ -1,4 +1,4 @@
-### thinkphp-6.0版本分析
+### thinkphp-6.0框架分析
 
 
 
