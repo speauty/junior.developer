@@ -20,7 +20,7 @@
 - And then, you can use `php --ri=xlswriter` to see the extend info built just now.
 
 ##### Some notices
-- Because of installed before, I don't install a lib named `zlib1g-dev`. If you install this extend first, you can use `sudo apt-get install zlib1g-dev` to install a lib.
+- Because of installed before, I don't need to install a lib named `zlib1g-dev` again. If you install this extend first, you can use `sudo apt-get install zlib1g-dev` to install a lib.
    
 Awkwardly, I think I need four or five coffees during downloading submodule. Emmm...it wastes half of hour, downloading too long...
 
