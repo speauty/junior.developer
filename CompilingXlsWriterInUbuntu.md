@@ -1,5 +1,5 @@
 #### Compiling Xlswriter in ubuntu
-*the php extend named xlswriter is reader and writer of xlsx, developed by [Viest](https://github.com/viest), [document](https://xlswriter-docs.viest.me/zh-cn/). As you see, the Article I will write almost like the part of document. If you feel boring, the article you can ignore immediately.*
+*the php extend named xlswriter is a reader and writer of xlsx, developed by [Viest](https://github.com/viest), [document](https://xlswriter-docs.viest.me/zh-cn/). As you see, the Article I will write almost like the part of document. If you feel boring, the article you can ignore immediately.*
 
 ##### Downloading the demo from github
 - to execute the command: `git clone https://github.com/viest/php-ext-excel-export`;
@@ -62,4 +62,4 @@ Awkwardly, I think I need four or five coffees during downloading submodule. Emm
          ->data($data)
          ->output();
    ```
-Oh, it's a sweet smell. if you want know more methods, please to see **[xlswriter document](https://xlswriter-docs.viest.me/)**.
+Oh, it's a sweet smell. if you want to know more methods, please to see **[xlswriter document](https://xlswriter-docs.viest.me/)**.
