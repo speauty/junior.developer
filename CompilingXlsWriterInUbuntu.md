@@ -1,6 +1,9 @@
 #### Compiling Xlswriter in ubuntu
 *the php extend named xlswriter is a reader and writer of xlsx, developed by [Viest](https://github.com/viest), [document](https://xlswriter-docs.viest.me/zh-cn/). As you see, the Article I will write almost like the part of document. If you feel boring, the article you can ignore immediately.*
 
+##### System
+Linux ubuntu-desktop 5.0.0-31-generic #33~18.04.1-Ubuntu SMP Tue Oct 1 10:20:39 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+
 ##### Downloading the demo from github
 - to execute the command: `git clone https://github.com/viest/php-ext-excel-export`;
    
