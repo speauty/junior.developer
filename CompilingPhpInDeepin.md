@@ -55,7 +55,30 @@
 
 ##### About compiling php, there has no more things to show, I will install extends tomorrow if free.
 
+##### Compiling swoole extend
+Not easy, because the names of package are different from centos.So, it's trouble me now.
+
+Using `wget https://github.com/swoole/swoole-src/archive/v4.4.8.tar.gz`, and unpacking next `tar -zxf v4.4.8.tar.gz`, `cd swoole-src-4.4.8`. then creating configure script, setting , making and installing:
+```bash
+> /usr/local/php/bin/phpize
+> sudo ./configure --with-php-config=/usr/local/php/bin/php-config
+> sudo make && sudo make install
+```
+
+The end, you should insert `extsion=swoole` to php.ini. Here are some errors I have seen:
+```bash
+Cannot find autoconf. Please check your autoconf installation and the
+$PHP_AUTOCONF environment variable. Then, rerun this script.
+> sudo apt-get install autoconf
+
+configure: error: C++ preprocessor "/lib/cpp" fails sanity check
+> sudo apt-get install build-essential
+```
+
+
+
 ##### Annexes
+
 * php-fpm73.service:
 ```
 [Unit]
