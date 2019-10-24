@@ -1,4 +1,6 @@
-#### Docker on Ubuntu
+#### Docker Learning
+
+*在ubuntu 18.04尝试的*
 
 ##### 安装 Docker
 ```bash
@@ -70,6 +72,67 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > # 使用history列出各层的创建信息
 > docker history local-centos:76
 > # 不过由于过长被自动截断, 可添加--no-trunc显示完整
+
+> # 搜索镜像
+> # 带keyword关键字的镜像
+> docker search keyword
+> --filter 增加过滤项
+> is-automated=true 仅显示自动创建的镜像, 默认false
+> stars=3 指定仅显示评价为指定星级以上的镜像, 默认0
+> --no-trunc=true 输出信息不截断显示 默认false
+> docker search --filter=is-automated=true --no-trunc=true nginx
+> docker search --filter=stars=3 --no-trunc=true nginx
+```
+
+##### 删除镜像
+```bash
+> # 使用标签删除镜像
+> docker rmi NAME:TAG
+> # 该操作只是删除对应镜像多个标签中的指定标签, 并不影响镜像文件
+
+> 使用ID删除镜像
+> docker rmi ID
+
+> 如果有依赖该镜像创建的容器, 需要先进行删除, 再删除相应镜像, 尽量不要使用-f进行强行删除
+```
+
+##### 创建镜像
+```bash
+> 基于已有镜像的容器创建
+> docker run -it local-centos:76 /bin/bash
+> # 先启动一个容器, 做点操作, 然后记住容器ID, 退出即可
+> docker commit -m '提交信息' -a '作者信息' 容器ID NAME:TAG
+> # -m 提交信息 -a 作者信息 -p 提交时暂停容器运行
+> docker commit -m 'add a file' -a 'Speauty' 3c4eaad406c4 test:0.1
+> sha256:352aafab413b1177cb779d58b88666ac2305a1c6d5bfcc357c8ea8d237b6d26f
+> # 创建成功的话, 会返回新镜像的一个Id值
+
+> 基于本地模板导入
+> # 要直接导入一个镜像, 可以使用[OpenVZ](http://openvz.org/Download/templates/precreated)提供的模板来创建, 或者用其他已导出的镜像模板创建.
+> cat ubuntu-14.04-x86_64-minimal.tar.gz | docker import - ubuntu:14.04
+```
+
+##### 存出和载入镜像
+```bash
+> # 存出镜像
+> docker save -o image.tar NAME:TAG
+> docker save -o centos76.tar local-centos:76
+
+> # 导入镜像
+> docker load --input image.tar
+> docker load < image.tar
+> docker load < centos76.tar
+> Loaded image: local-centos:76
+```
+
+##### 上传镜像
+```bash
+> docker push NAME:TAG [registry]NAME:TAG
+> # 在上传之前, 可以先使用 docker tag 为镜像添加新标签.
+> docker tag local-centos:76 hub-user-name/remote-repository-name:tag
+> docker push hub-user-name/remote-repository-name:tag
+> # 如果没登录, 会提示被拒绝, 使用 docker login 进行登录, 再重新上传, 一般问题都不大.
+> # 默认上传到 [hub-docker](https://hub.docker.com/)
 ```
 
 
