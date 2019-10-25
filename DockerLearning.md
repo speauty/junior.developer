@@ -28,7 +28,7 @@ Server:
   Built:            Thu Aug 15 15:12:41 2019
   OS/Arch:          linux/amd64
   Experimental:     false
-> # 简单查看docker版本号
+> # 简单查看docker版本号.
 > docker -v
 Docker version 18.09.7, build 2d0083d
 
@@ -37,11 +37,11 @@ Docker version 18.09.7, build 2d0083d
 ##### 获取镜像
 ```bash
 > # 从Docker Hub镜像源下载镜像
-> # registry-注册服务器, 默认使用Docker Hub服务
-> # NAME-镜像名 TAG-镜像标签,默认为latest
+> # registry-注册服务器, 默认使用Docker Hub服务.
+> # NAME-镜像名 TAG-镜像标签,默认为latest.
 > docker pull [registry]NAME[:TAG]
 > # -a, --all-tags=true|false: 是否获取仓库中的所有镜像, 默认false.
-> # 比如, 下载centos 7.6.1810版本
+> # 比如, 下载centos 7.6.1810版本.
 > docker pull centos:7.6.1810
 7.6.1810: Pulling from library/centos
 ac9208207ada: Pull complete 
@@ -53,33 +53,33 @@ Status: Downloaded newer image for centos:7.6.1810
 ```bash
 > # 查看已有镜像的信息
 > docker images
-> # 更多参数, 使用 man docker images查看
+> # 更多参数, 使用 man docker images查看.
 
 > # 使用docker tag为本地镜像任意添加新的标签, 相当于链接(快捷方式)
-> # NEWNAME必须全为小写字母, 否则会报错
+> # NEWNAME必须全为小写字母, 否则会报错.
 Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid reference format: repository name must be lowercase
 > docker tag NAME:TAG NEWNAME:NEWTAG
 > docker tag centos:7.6.1810 local-centos:76
-> # 上面那个镜像的镜像ID还是保持一致的, 可以看出docker tag只是添加了一个快捷方式, 并不影响实际文件
+> # 上面那个镜像的镜像ID还是保持一致的, 可以看出docker tag只是添加了一个快捷方式, 并不影响实际文件.
 
-> # 使用inspect查看详细信息
-> # 使用docker inspect可以获取该镜像的详细信息, 包括制作者/适应架构/各层的数字摘要等
+> # 使用inspect查看详细信
+> # 使用docker inspect可以获取该镜像的详细信息, 包括制作者/适应架构/各层的数字摘要等.
 > docker inspect NAME:TAG
-> # 可使用参数-f指定其中一项内容
+> # 可使用参数-f指定其中一项内容.
 > docker inspect local-centos:76 -f {{".Architecture"}}
 
 > # 查看镜像历史
-> # 使用history列出各层的创建信息
+> # 使用history列出各层的创建信息.
 > docker history local-centos:76
-> # 不过由于过长被自动截断, 可添加--no-trunc显示完整
+> # 不过由于过长被自动截断, 可添加--no-trunc显示完整.
 
 > # 搜索镜像
 > # 带keyword关键字的镜像
 > docker search keyword
-> --filter 增加过滤项
-> is-automated=true 仅显示自动创建的镜像, 默认false
-> stars=3 指定仅显示评价为指定星级以上的镜像, 默认0
-> --no-trunc=true 输出信息不截断显示 默认false
+> --filter 增加过滤项.
+> is-automated=true 仅显示自动创建的镜像, 默认false.
+> stars=3 指定仅显示评价为指定星级以上的镜像, 默认0.
+> --no-trunc=true 输出信息不截断显示 默认false.
 > docker search --filter=is-automated=true --no-trunc=true nginx
 > docker search --filter=stars=3 --no-trunc=true nginx
 ```
@@ -88,24 +88,24 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 ```bash
 > # 使用标签删除镜像
 > docker rmi NAME:TAG
-> # 该操作只是删除对应镜像多个标签中的指定标签, 并不影响镜像文件
+> # 该操作只是删除对应镜像多个标签中的指定标签, 并不影响镜像文件.
 
 > 使用ID删除镜像
 > docker rmi ID
 
-> 如果有依赖该镜像创建的容器, 需要先进行删除, 再删除相应镜像, 尽量不要使用-f进行强行删除
+> 如果有依赖该镜像创建的容器, 需要先进行删除, 再删除相应镜像, 尽量不要使用-f进行强行删除.
 ```
 
 ##### 创建镜像
 ```bash
 > 基于已有镜像的容器创建
 > docker run -it local-centos:76 /bin/bash
-> # 先启动一个容器, 做点操作, 然后记住容器ID, 退出即可
+> # 先启动一个容器, 做点操作, 然后记住容器ID, 退出即可.
 > docker commit -m '提交信息' -a '作者信息' 容器ID NAME:TAG
-> # -m 提交信息 -a 作者信息 -p 提交时暂停容器运行
+> # -m 提交信息 -a 作者信息 -p 提交时暂停容器运行.
 > docker commit -m 'add a file' -a 'Speauty' 3c4eaad406c4 test:0.1
 > sha256:352aafab413b1177cb779d58b88666ac2305a1c6d5bfcc357c8ea8d237b6d26f
-> # 创建成功的话, 会返回新镜像的一个Id值
+> # 创建成功的话, 会返回新镜像的一个Id值.
 
 > 基于本地模板导入
 > # 要直接导入一个镜像, 可以使用[OpenVZ](http://openvz.org/Download/templates/precreated)提供的模板来创建, 或者用其他已导出的镜像模板创建.
@@ -135,4 +135,47 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > # 默认上传到 [hub-docker](https://hub.docker.com/)
 ```
 
+##### 创建容器
+```bash
+> # 新建容器
+> docker create -it NAME:TAG
+> # 使用 docker create新建的容器处于停止状态, 需要使用docker run来进行启动.
+
+> # 启动容器
+> docker run 容器ID
+
+> # 新建并启动容器
+> docker run local-centos:76 /bin/echo 'hello world'
+> # -t 让docker分配一个伪终端(pseduo-tty)并绑定到容器的标准输入上,
+> # -i 让容器的标准输入保持打开
+> # -d 可在后台运行
+> docker run -it local-centos:76 /bin/bash
+> # Ctrl+d或输入exit退出容器
+
+> # 停止容器
+> docker stop 容器ID
+> # docker ps -qa 可看到所有容器的ID.
+> # 处于终止态的容器, 可使用docker start 来启动.
+> # docker restart 会将一个运行态的容器先终止, 然后再重新启动它.
+```
+
+#### 进入容器
+```bash
+> # attach进入
+> docker attach CONTAINER-ID
+> # --detach-keys=[] 指定退出attach,模式的快捷键序列, 默认时Ctrl+p Ctrl+q.
+> # --no-stdin=true|false 是否关闭标准输入, 默认是保持打开.
+> # --sig-proxy=true|false 是否代理收到系统信号给应用程序, 默认为true.
+> # 当多个窗口同时使用attach命令连到一个容器的时候, 所有窗口都会同步显示.
+> # 当某个窗口因命令阻塞时, 其他窗口也无法执行操作.
+
+> # exec进入
+> docker exec -it CONTAINER-ID COMMAND
+> # -i 打开标准输入接受用户输入命令, 默认false.
+> # --privileged=true|false 是否给执行命令以高权限 默认false.
+> # -t 分配伪终端 默认 false.
+> # -u,--user='' 执行命令的用户名或ID.
+> docker exec -it 16c78f8e3e11 /bin/bash
+
+```
 
