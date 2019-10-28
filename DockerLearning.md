@@ -159,7 +159,7 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > # docker restart 会将一个运行态的容器先终止, 然后再重新启动它.
 ```
 
-#### 进入容器
+##### 进入容器
 ```bash
 > # attach进入
 > docker attach CONTAINER-ID
@@ -176,6 +176,25 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > # -t 分配伪终端 默认 false.
 > # -u,--user='' 执行命令的用户名或ID.
 > docker exec -it 16c78f8e3e11 /bin/bash
+```
 
+##### 删除容器
+```bash
+> # 删除处于终止态或退出状态的容器
+> docker rm [-f] [-l] [-v] CONTAINER-ID
+> # -f 是否强行终止并删除一个运行中的容器;
+> # -l 删除容器的连接, 但保留容器;
+> # -v 删除容器挂载的数据卷;
+> # 默认情况下, docker rm 命令只能删除处于终止或退出状态的容器, 并不能删除处于运行状态的容器;
+> # 如果要删除一个运行中的容器, 可以添加-f参数. docker会先发送SIGNKILL信号给容器, 终止其中的应用, 之后强行删除.
+``` 
+
+##### 导入和导出容器
+```bash
+> # 导出容器
+> # -o 指定导出的tar文件名
+> docker export -o tarPath CONTAINER-ID
+> # 直接通过重定向存到文件
+> docker export CONTAINER-ID > tarPath
 ```
 
