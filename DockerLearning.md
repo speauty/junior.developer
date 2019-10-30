@@ -196,5 +196,34 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > docker export -o tarPath CONTAINER-ID
 > # 直接通过重定向存到文件
 > docker export CONTAINER-ID > tarPath
+
+> # 导入容器
+> docker import tarPath - REPOSITORY/NAME:TAG
+> # 将导出的文件使用docker import导入变成镜像
 ```
+##### Docker Hub 公共镜像市场
+```bash
+> # 登录
+> docker login
+> # 用户在登录后可通过docker push将本地镜像推送到docker hub
+
+> # 配置自动创建
+> # 1. 创建并登录docker hub, 以及目标网站;在目标网站中连接账户到docker;
+> # 2. 在docker hub中配置一个自动创建;
+> # 3. 选取一个目标网站中的项目(需要含docker file)和分支;
+> # 4. 指定dockerfile的位置, 并提交创建
+
+> # 时速云的注册服务器地址 index.tenxcloud.com
+```
+
+##### 创建本地私有仓库
+```bash
+> # 使用Registry镜像创建私有仓库
+> # 自动下载并启动一个registry容器, 创建本地的私有仓库服务
+> docker run -d -p 5000:5000 registry
+> # 默认情况下, 会将仓库创建在容器的/tmp/registry目录下, 可以通过-v参数来将镜像文件存放在本地的指定路径(必须为小写字母)
+> docker run -d -p 5000:5000 -v /opt/data/registry:/tmp/registry registry
+```
+
+
 
