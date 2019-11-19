@@ -340,5 +340,89 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > # 用户可以连接多个子容器到父容器, 比如可以连接多个web到同一个db容器上
 ```
 
+##### Dockerfile
+```bash
+> # Dockerfile是一个文本格式的配置文件, 用户可以使用Dockerfile来快速创建自定义镜像
+> # Dockerfile由一行行命令语句组成, 并且支持以#开头的注释行, 一般分为四部分
+> # 基础镜像信息, 维护者信息, 镜像操作指令和容器启动时执行指令
+
+> # 1. 指令说明
+> # 1.1 FROM
+> # 指定所创建镜像的基础镜像, 如果本地不存在, 则默认会去Docker Hub下载指定镜像
+> # 格式 FROM <iamge> 或 FROM <image>:<tag> 或 FROM <image>@<digest>
+> # 任何Dockerfile中的第一条指令必须为FROM指令. 如果在同一个Dockerfile中创建多个镜像, 可以使用多个FROM指令(每个镜像一次)
+> # 1.2 MAINTAINER
+> # 指定维护者信息, 格式为 MAINTAINER <name>, 该信息会写入生成镜像的Author属性域中
+> # 1.3 RUN
+> # 运行指定命令
+> # 格式RUN <command> 或 RUN ["executable", "param1", "param2"], 后一个指定会被解析为Json数组, 因此必须用双引号
+> # 前者默认将在shell终端(bin/sh -c)中运行命令; 后者使用exec执行, 不会启动shell环境. 指定使用其他终端类型可以通过第二种方式实现
+> # 每条RUN指令将在当前镜像的基础上执行指定命令, 并提交为新的镜像. 当命令较长时可以使用\来换行
+> # 1.4 CMD
+> # CMD指令用来指定启动容器时默认执行的命令, 主要有三种格式
+> # CMD ["executable", "param1", "param2"]使用exec执行
+> # CMD command param1 param2在/bin/sh中执行, 提供给需要交互的应用
+> # CMD ["param1", "param2"]提供给ENTRYPONIT的默认参数
+> # 每个Dockerfile只有有一条CMD命令. 如果指定了多条命令, 只有最后一条会被执行
+> # 如果用户启动容器时手动指定了运行的命令(作为run的参数), 则会覆盖掉CMD指定的命令
+> # 1.5 LABEL
+> # LABEL指令用来指定生成镜像的元数据标签信息
+> # 格式 LABEL <key>=<value> <key>=<value>...
+> # 1.6 EXPOSE
+> # 声明镜像内服务所监听的端口, EXPOSE <port> [<port>...]
+> # 该指令只是起到声明作用, 并不会自动完成端口映射
+> # 在启动容器时需要使用-P, Docker主机会自动分配一个宿主机的临时端口转发到指定的端口; 使用-p, 则可以具体指定哪个宿主机的本地端口会映射过来
+> # 1.7 ENV
+> # 指定环境变量, 在镜像生成过程中会被后续RUN指令使用, 在镜像启动的容器中也会存在
+> # 格式 ENV <key><value>或ENV <key>=<value>
+> # 指令指定的环境变量在运行时可以被覆盖掉, 如docker run --env <key>=<value> test
+> # 1.8 ADD
+> # 该命令将复制指定的<src>路径下的内容到容器中的<dest>路径下, ADD <src> <dest>
+> # 其中<src>可以是Dockerfile所在目录的一个相对路径(文件或目录), 也可以是一个URL, 也可以是一个tar文件(如果为tar文件, 会自动解压到<dest>路径下).
+> # <dest>可以是镜像内的绝对路径, 或相对于工作目录(WORKDIR)的相对路径
+> # <src>路径支持正则格式
+> # 1.9 COPY
+> # 将本地<src>路径下的内容复制到镜像中<dest>路径下, COPY <src> <dest>
+> # 复制本地主机的<src>(为Dockerfile所在目录的相对路径,文件或目录)下的内容到镜像中的<dest>下,. 目标路径不存在时, 会自动创建
+> # 1.10 ENTRYPOINT
+> # 指定镜像的默认入口命令, 该入口命令会在启动容器时作为根命令执行, 所有传入值作为该命令的参数, 支持两种格式
+> # ENTRYPOINT ["executable", "param1", "param2"] (exec调用执行)
+> # ENTRYPOINT command param1 param2 (shell中执行)
+> # 此时, CMD指令指定值作为根命令的参数
+> # 每个Dockerfile中只能有一个ENTRYPOINT, 当指定多个时, 只有最后一个有效
+> # 在运行时, 可以被--entrypoint参数覆盖掉, 如docker run --entrypoint
+> # 1.11 VOLUME
+> # 创建一个数据卷挂载点, VOLUME ["/data"]
+> # 可以从本地主机或其他容器挂载数据卷, 一般用来存放数据库和需要保存的数据等
+> # 1.12 USER
+> # 指定运行容器时的用户名后UID, 后续的RUN等指令也会使用指定的用户身份, USER daemon
+> # 当服务不需要管理员权限时, 可以通过该命令指定运行用户, 并且可以在之前创建所需要的用户
+> # RUN groupadd -r test && useradd -r -g test test
+> # 要临时获取管理员权限可以使用gosu或sodu
+> # 1.13 WORKDIR
+> # 为后续的RUN,CMD和ENTRYPOINT指令配置工作目录, WORKDIR /path/to/workdir
+> # 可以使用多个WORKDIR指令, 后续命令如果参数是相对路径, 则会基于之前命令指定的路径\
+> # 1.14 ARG
+> # 指定一些镜像内使用的参数, 这些参数在执行docker build命令时才以--build-arg<varname>=<vallue>格式传入, ARG <name>[=<default value>]
+> # 可以用docker build --build-arg<name>=<value>, 来指定参数值
+> # 1.15 ONBUILD
+> # 配置当所创建的镜像作为其他镜像的基础镜像时, 所执行的创建操作指令, ONBUILD [INSTRUCTION]
+> # 使用ONBUILD指令的镜像, 最好在标签中注明, name-onbuild
+> # 1.16 STOPSIGNAL
+> # 指定所创建镜像启动的容器接收退出的信号值, STOPSIGNAL=signal
+> # 1.17 HEALTHCHECK
+> # 配置所启动容器如何进行健康检查, 主要有两种格式
+> # HEALTHCHECK [OPTIONS] CMD command: 根据所执行命令返回值是否为0来判断
+> # HEALTHCHECK NONE: 禁止基础镜像中的健康检查
+> # --interval=DURATION(默认30s), 检查周期
+> # --timeout=N(默认30s), 每次检查等待结果的超时
+> # --reties=N(默认为3), 重试次数
+> # 1.18 SHELL
+> # 指定其他命令使用shell时的默认shell类型, SHELL ["/bin/sh", "-c"]
+
+> # 对于windows系统, 建议在Dockerfule开头添加# escape=`来指定转义信息
+```
+
+
 
 
