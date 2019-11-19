@@ -225,5 +225,30 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > docker run -d -p 5000:5000 -v /opt/data/registry:/tmp/registry registry
 ```
 
+##### 数据卷
+```bash
+> # 容器中管理数据主要的两种方式
+> 数据卷: 容器内数据直接映射到本地主机环境
+> 数据卷容器: 使用特定容器维护数据卷
+
+> # 1. 在容器内创建一个数据卷
+> # 使用-v标记可以在容器内创建一个数据卷, 可重复使用
+> # -P是将容器服务暴露的端口, 是自动映射到本地主机的临时端口
+> docker run -d -P --name test -v /testwww local-centos:76
+> # 创建一个容器, 并创建一个数据卷挂在到容器的/testwww目录
+
+> # 2. 挂载一个主机目录作为数据卷
+> # 使用-v标记也可以指定挂载一个本地的已有目录到容器中去作为数据卷
+> docker run -d -P --name test -v /src/testwww:/opt/testwww local-centos:76
+> # 加载主机的/src/testwww目录到容器的/opt/testwww目录
+> # 本地目录的路径必须是绝对路径, 如果目录不存在, docker会自动创建
+> # docker挂在数据卷的默认权限是读写(rw), 也可通过ro指定为只读, 容器内对所挂载数据卷内的数据就无法修改了
+> docker run -d -P --name test -v /src/testwww:/opt/testwww:ro local-centos:76
+
+> # 3. 挂载一个本地主机文件作为数据卷
+> # -v标记也可以从主机挂载单个文件到容器中作为数据卷
+> docker run --rm -it -v ~/.bash_history:/.bash_history local-centos:76 /bin/bash
+```
+
 
 
