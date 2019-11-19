@@ -421,6 +421,16 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > # 指定其他命令使用shell时的默认shell类型, SHELL ["/bin/sh", "-c"]
 
 > # 对于windows系统, 建议在Dockerfule开头添加# escape=`来指定转义信息
+
+> # 2. 创建镜像
+> # 编写完Dockerfile之后, 可以通过docker buid命令来创建镜像, 基本格式为docker build [选项] 内容路径
+> # 该命令将读取指定路径下(包括子目录)的Dockerfile, 并将该路径下的所有内容发送给Docker服务端, 由服务端来创建镜像.
+> # 因此, 除非生成镜像需要, 否则一般建议放置Dockerfile的目录为空目录
+> # 如果使用非内容路径下的Dockerfile吗可以通过-f选项来指定其路径
+> # 要指定生成镜像的标签信息, 可以使用-t选项
+
+> # 3. 使用.dockerignore文件
+> # 可以通过.dockerignore文件(每一行添加一条匹配模式)来让Docker忽略匹配模式路径下的目录和文件
 ```
 
 
