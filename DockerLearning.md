@@ -433,6 +433,27 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > # 可以通过.dockerignore文件(每一行添加一条匹配模式)来让Docker忽略匹配模式路径下的目录和文件
 ```
 
+##### 操作系统
+```bash
+
+> # BusyBox "Linux系统的瑞士军刀"
+> # busybox是一个集成了一百多个最常用Linux命令和工具(如cat, echo, grep,mount,telnet等)的精简工具箱, 只有几MB的大小, 可以很方便的进行各种快速验证
+> # 可运行于多款POSIX环境的操作系统中, 如Linux()包括Android, Hurd, FreeBSD等
+> docker pull busybox:latest
+
+> # Alpine
+> # Alpine操作系统是一个面向安全的轻型Linux发行版, 不同于通常的Linux发行版, Alpine采用了musl libc和BusyBox以减小系统的体积和运行时资源消耗, 但功能上比BusyBox又完善得多
+> # 在保持瘦身的同时, Alpine还提供了自己的包管理工具apk, 具体软件安装包可在https://pkgs.alpinelinux.org/packages查询
+
+> # Debian/Ubuntu
+> # Debian是由GPL和其他自由软件许可协议授权的自由软件组成的操作, 由Debian Project组织维护
+> # Ubuntu是一个以桌面应用为主的GUN/Linux操作系统, 其名称来自非洲南部祖鲁语或豪萨语的"ubuntu"一词, 基于Debian发行版和GNOME/Unity桌面环境
+> # 与Debian的不同在于它每6个月会发布一个新版本, 每2年会推出一个长期支持版本, 一般支持3年
+
+> # CentOS/Fedora
+> # CentOS和Fedora都是基于Redhat的常见Linux分支. CentOS是目前企业级服务器的常用操作系统; Fedora主要面向个人桌面用户
+```
+
 
 
 
