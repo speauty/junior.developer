@@ -225,5 +225,262 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > docker run -d -p 5000:5000 -v /opt/data/registry:/tmp/registry registry
 ```
 
+##### 数据卷
+```bash
+> # 容器中管理数据主要的两种方式
+> 数据卷: 容器内数据直接映射到本地主机环境
+> 数据卷容器: 使用特定容器维护数据卷
+
+> # 1. 在容器内创建一个数据卷
+> # 使用-v标记可以在容器内创建一个数据卷, 可重复使用
+> # -P是将容器服务暴露的端口, 是自动映射到本地主机的临时端口
+> docker run -d -P --name test -v /testwww local-centos:76
+> # 创建一个容器, 并创建一个数据卷挂在到容器的/testwww目录
+
+> # 2. 挂载一个主机目录作为数据卷
+> # 使用-v标记也可以指定挂载一个本地的已有目录到容器中去作为数据卷
+> docker run -d -P --name test -v /src/testwww:/opt/testwww local-centos:76
+> # 加载主机的/src/testwww目录到容器的/opt/testwww目录
+> # 本地目录的路径必须是绝对路径, 如果目录不存在, docker会自动创建
+> # docker挂在数据卷的默认权限是读写(rw), 也可通过ro指定为只读, 容器内对所挂载数据卷内的数据就无法修改了
+> docker run -d -P --name test -v /src/testwww:/opt/testwww:ro local-centos:76
+
+> # 3. 挂载一个本地主机文件作为数据卷
+> # -v标记也可以从主机挂载单个文件到容器中作为数据卷
+> docker run --rm -it -v ~/.bash_history:/.bash_history local-centos:76 /bin/bash
+```
+
+##### 数据卷容器
+```bash
+> # 数据卷容器也是一个容器, 但是它的目的是专门用来提供数据卷供其他容器挂载
+
+> # 创建一个数据卷容器, 并创建一个数据卷挂载
+> # 在其他容器中使用-volumes-from可以挂载数据卷容器的数据卷
+> docker run -it -v /dbdata --name db local-centos:76 /bin/bash
+> # 创建两个挂载数据卷容器数据卷的其他容器容器
+> docker run -it --volumes-from db --name test_db1 local-centos:76 
+> docker run -it --volumes-from db --name test_db2 local-centos:76
+> # 可以多次使用--volumes-from从多个容器挂载多个数据卷. 还可以从其他已挂载的容器卷的容器来挂载数据卷
+
+> # 使用--volumes-from参数所挂载数据卷的容器自身并不需要保持在运行状态
+> # 如果删除了挂载的容器(包括db/test_db1/test_db2), 数据卷并不会被自动删除. 如果要一个数据卷, 必须在删除最后一个还挂载着它的容器时显示使用docker rm -v命令来指定同时删除关联的容器
+> # 使用数据卷容器可以让用户在容器之间自由地升级和移动数据卷
+
+> # 利用数据卷容器来迁移数据
+> # 1. 备份
+> docker run --columes-from db -v $(pwd):/backup --name worker local-centos:76 tar cvf /backup/backup.tar /dbdata
+> # $(pwd) 当前路径
+> # tar cvf 仅打包不压缩, 这里是将/dbdata目录打包到/backup/backup.tar文件中, 通过数据卷共享到本地
+
+> # 2. 恢复
+> # 先创建一个带数据卷的容器
+> docker run -v /dbdata --name db local-centos:76 /bin/bash
+> # 再创建一个新容器, 挂载db的容器, 并使用untar解压备份文件到所挂载的容器卷中
+> docker run --volumes-from db -v $(pwd):/backup busybox tar xvf /backup/backup.tar
+```
+
+##### docker允许映射容器内应用的服务端口到本地宿主主机
+##### 互联机制实现多个容器间通过容器名来快速访问
+
+##### 端口映射实现访问容器
+```bash
+> # 1. 从外部访问容器应用
+> # 在启动容器时, 如果不指定对应的参数, 在容器外部是无法通过网络来访问容器内的网络应用和服务的
+> # 可以通过-P或-p参数来指定端口映射, 当使用-P标记时, Docker会随机映射一个49000~49900的端口到内部容器开放的网络端口
+> # -p 可以指定要映射的端口, 并且在一个指定端口上只可以绑定一个容器, 支持的格式:
+> # IP:Hostport:ContainerPort | IP::ContainerPort | HostPort:ContainerPort
+> docker run -it -d -P --name test local-centos:76
+> docker run -it -d -p 127.0.0.1:54335:54335 --name testp local-centos:76
+> # 可以使用 docker logs -f container-name
+
+> # 2. 映射所有接口地址
+> # 使用HostPort:ContainerPort格式将本地的5000端口映射到容器的5000端口
+> docker run -it -d -p 5000:5000 --name testp local-centos:76
+> # 默认会绑定本地所有接口上的所有地址, 可多次使用-p标记绑定多个接口
+
+> # 3. 映射到指定地址的指定端口
+> # 使用IP:Hostport:ContainerPort格式指定映射使用一个特定地址
+> docker run -it -d -p 127.0.0.1:54335:54335 --name testp local-centos:76
+
+> # 4. 映射到指定地址的任意端口
+> # 使用IP::ContainerPort绑定localhost的任意端口到容器的5000端口, 本地主机会自动分配一个端口
+> docker run -it -d -p 127.0.0.1::5000 --name testp local-centos:76
+> # 还可以使用udp标记来指定udp端口
+> docker run -it -d -p 127.0.0.1::5000/udp --name testp local-centos:76
+
+> # 5. 查看端口配置
+> docker port Container-name [ContainerPort]
+
+> # 容器有自己的内部网络和IP地址, 使用docker inspect ContainerId可以获取容器的具体信息
+```
+
+##### 互联机制实现便捷互访
+```bash
+> # 容器的互联是一种让多个容器中应用进行快速交互的方式
+> # 它会在源和接受容器之间创建连接关系, 接受容器可以通过容器名快速访问到源容器, 而不用指定具体的IP地址
+
+> # 1. 自定义容器命名
+> # 连接系统依据容器的名称来执行, 容器的名称是唯一的
+> # 使用--name标记可以为容器自定义命名
+> # 可以使用docker inspect -f "{{.Name}}" ContainerId来查看容器的名字
+
+> # 在执行docker run的时候如果添加--rm标记, 则容器在终止后会立刻删除. 注意, --rm和-d参数不能同时使用
+
+> # 2. 容器互联
+> # 使用--link参数可以让容器之间安全地进行交互
+> # 还是和之前操作一样, 创建一个数据库容器
+> docker run -it -d --name db local-centos:76
+> # 创建一个新的容器, 并将它连接到db容器
+> docker run -it -d -P --name web --link db:db local-centos:76
+> # --link name:alias, 其中name是要连接的容器名称, alias是这个连接的别名
+> # 使用env命令来查看web容器的环境变量
+> # 其中DB_开头的环境变量是提供web容器连接db容器使用的, 前缀采用大写的连接别名
+> # 除了环境变量外, docker还添加了host信息到父容器的/etc/hosts文件
+
+> # 用户可以连接多个子容器到父容器, 比如可以连接多个web到同一个db容器上
+```
+
+##### Dockerfile
+```bash
+> # Dockerfile是一个文本格式的配置文件, 用户可以使用Dockerfile来快速创建自定义镜像
+> # Dockerfile由一行行命令语句组成, 并且支持以#开头的注释行, 一般分为四部分
+> # 基础镜像信息, 维护者信息, 镜像操作指令和容器启动时执行指令
+
+> # 1. 指令说明
+> # 1.1 FROM
+> # 指定所创建镜像的基础镜像, 如果本地不存在, 则默认会去Docker Hub下载指定镜像
+> # 格式 FROM <iamge> 或 FROM <image>:<tag> 或 FROM <image>@<digest>
+> # 任何Dockerfile中的第一条指令必须为FROM指令. 如果在同一个Dockerfile中创建多个镜像, 可以使用多个FROM指令(每个镜像一次)
+> # 1.2 MAINTAINER
+> # 指定维护者信息, 格式为 MAINTAINER <name>, 该信息会写入生成镜像的Author属性域中
+> # 1.3 RUN
+> # 运行指定命令
+> # 格式RUN <command> 或 RUN ["executable", "param1", "param2"], 后一个指定会被解析为Json数组, 因此必须用双引号
+> # 前者默认将在shell终端(bin/sh -c)中运行命令; 后者使用exec执行, 不会启动shell环境. 指定使用其他终端类型可以通过第二种方式实现
+> # 每条RUN指令将在当前镜像的基础上执行指定命令, 并提交为新的镜像. 当命令较长时可以使用\来换行
+> # 1.4 CMD
+> # CMD指令用来指定启动容器时默认执行的命令, 主要有三种格式
+> # CMD ["executable", "param1", "param2"]使用exec执行
+> # CMD command param1 param2在/bin/sh中执行, 提供给需要交互的应用
+> # CMD ["param1", "param2"]提供给ENTRYPONIT的默认参数
+> # 每个Dockerfile只有有一条CMD命令. 如果指定了多条命令, 只有最后一条会被执行
+> # 如果用户启动容器时手动指定了运行的命令(作为run的参数), 则会覆盖掉CMD指定的命令
+> # 1.5 LABEL
+> # LABEL指令用来指定生成镜像的元数据标签信息
+> # 格式 LABEL <key>=<value> <key>=<value>...
+> # 1.6 EXPOSE
+> # 声明镜像内服务所监听的端口, EXPOSE <port> [<port>...]
+> # 该指令只是起到声明作用, 并不会自动完成端口映射
+> # 在启动容器时需要使用-P, Docker主机会自动分配一个宿主机的临时端口转发到指定的端口; 使用-p, 则可以具体指定哪个宿主机的本地端口会映射过来
+> # 1.7 ENV
+> # 指定环境变量, 在镜像生成过程中会被后续RUN指令使用, 在镜像启动的容器中也会存在
+> # 格式 ENV <key><value>或ENV <key>=<value>
+> # 指令指定的环境变量在运行时可以被覆盖掉, 如docker run --env <key>=<value> test
+> # 1.8 ADD
+> # 该命令将复制指定的<src>路径下的内容到容器中的<dest>路径下, ADD <src> <dest>
+> # 其中<src>可以是Dockerfile所在目录的一个相对路径(文件或目录), 也可以是一个URL, 也可以是一个tar文件(如果为tar文件, 会自动解压到<dest>路径下).
+> # <dest>可以是镜像内的绝对路径, 或相对于工作目录(WORKDIR)的相对路径
+> # <src>路径支持正则格式
+> # 1.9 COPY
+> # 将本地<src>路径下的内容复制到镜像中<dest>路径下, COPY <src> <dest>
+> # 复制本地主机的<src>(为Dockerfile所在目录的相对路径,文件或目录)下的内容到镜像中的<dest>下,. 目标路径不存在时, 会自动创建
+> # 1.10 ENTRYPOINT
+> # 指定镜像的默认入口命令, 该入口命令会在启动容器时作为根命令执行, 所有传入值作为该命令的参数, 支持两种格式
+> # ENTRYPOINT ["executable", "param1", "param2"] (exec调用执行)
+> # ENTRYPOINT command param1 param2 (shell中执行)
+> # 此时, CMD指令指定值作为根命令的参数
+> # 每个Dockerfile中只能有一个ENTRYPOINT, 当指定多个时, 只有最后一个有效
+> # 在运行时, 可以被--entrypoint参数覆盖掉, 如docker run --entrypoint
+> # 1.11 VOLUME
+> # 创建一个数据卷挂载点, VOLUME ["/data"]
+> # 可以从本地主机或其他容器挂载数据卷, 一般用来存放数据库和需要保存的数据等
+> # 1.12 USER
+> # 指定运行容器时的用户名后UID, 后续的RUN等指令也会使用指定的用户身份, USER daemon
+> # 当服务不需要管理员权限时, 可以通过该命令指定运行用户, 并且可以在之前创建所需要的用户
+> # RUN groupadd -r test && useradd -r -g test test
+> # 要临时获取管理员权限可以使用gosu或sodu
+> # 1.13 WORKDIR
+> # 为后续的RUN,CMD和ENTRYPOINT指令配置工作目录, WORKDIR /path/to/workdir
+> # 可以使用多个WORKDIR指令, 后续命令如果参数是相对路径, 则会基于之前命令指定的路径\
+> # 1.14 ARG
+> # 指定一些镜像内使用的参数, 这些参数在执行docker build命令时才以--build-arg<varname>=<vallue>格式传入, ARG <name>[=<default value>]
+> # 可以用docker build --build-arg<name>=<value>, 来指定参数值
+> # 1.15 ONBUILD
+> # 配置当所创建的镜像作为其他镜像的基础镜像时, 所执行的创建操作指令, ONBUILD [INSTRUCTION]
+> # 使用ONBUILD指令的镜像, 最好在标签中注明, name-onbuild
+> # 1.16 STOPSIGNAL
+> # 指定所创建镜像启动的容器接收退出的信号值, STOPSIGNAL=signal
+> # 1.17 HEALTHCHECK
+> # 配置所启动容器如何进行健康检查, 主要有两种格式
+> # HEALTHCHECK [OPTIONS] CMD command: 根据所执行命令返回值是否为0来判断
+> # HEALTHCHECK NONE: 禁止基础镜像中的健康检查
+> # --interval=DURATION(默认30s), 检查周期
+> # --timeout=N(默认30s), 每次检查等待结果的超时
+> # --reties=N(默认为3), 重试次数
+> # 1.18 SHELL
+> # 指定其他命令使用shell时的默认shell类型, SHELL ["/bin/sh", "-c"]
+
+> # 对于windows系统, 建议在Dockerfule开头添加# escape=`来指定转义信息
+
+> # 2. 创建镜像
+> # 编写完Dockerfile之后, 可以通过docker buid命令来创建镜像, 基本格式为docker build [选项] 内容路径
+> # 该命令将读取指定路径下(包括子目录)的Dockerfile, 并将该路径下的所有内容发送给Docker服务端, 由服务端来创建镜像.
+> # 因此, 除非生成镜像需要, 否则一般建议放置Dockerfile的目录为空目录
+> # 如果使用非内容路径下的Dockerfile吗可以通过-f选项来指定其路径
+> # 要指定生成镜像的标签信息, 可以使用-t选项
+
+> # 3. 使用.dockerignore文件
+> # 可以通过.dockerignore文件(每一行添加一条匹配模式)来让Docker忽略匹配模式路径下的目录和文件
+```
+
+##### 操作系统
+```bash
+
+> # BusyBox "Linux系统的瑞士军刀"
+> # busybox是一个集成了一百多个最常用Linux命令和工具(如cat, echo, grep,mount,telnet等)的精简工具箱, 只有几MB的大小, 可以很方便的进行各种快速验证
+> # 可运行于多款POSIX环境的操作系统中, 如Linux()包括Android, Hurd, FreeBSD等
+> docker pull busybox:latest
+
+> # Alpine
+> # Alpine操作系统是一个面向安全的轻型Linux发行版, 不同于通常的Linux发行版, Alpine采用了musl libc和BusyBox以减小系统的体积和运行时资源消耗, 但功能上比BusyBox又完善得多
+> # 在保持瘦身的同时, Alpine还提供了自己的包管理工具apk, 具体软件安装包可在https://pkgs.alpinelinux.org/packages查询
+
+> # Debian/Ubuntu
+> # Debian是由GPL和其他自由软件许可协议授权的自由软件组成的操作, 由Debian Project组织维护
+> # Ubuntu是一个以桌面应用为主的GUN/Linux操作系统, 其名称来自非洲南部祖鲁语或豪萨语的"ubuntu"一词, 基于Debian发行版和GNOME/Unity桌面环境
+> # 与Debian的不同在于它每6个月会发布一个新版本, 每2年会推出一个长期支持版本, 一般支持3年
+
+> # CentOS/Fedora
+> # CentOS和Fedora都是基于Redhat的常见Linux分支. CentOS是目前企业级服务器的常用操作系统; Fedora主要面向个人桌面用户
+```
+
+##### 为镜像添加SSH服务
+```bash
+> # 1. 基于commit命令创建
+> docker run -it -d --name tsshd local-centos:76 /bin/bash
+> docker exec -it ContainerId /bin/bash
+> # 进入系统后, 更新yum, yum update
+> # 然后, 安装, yum install openssh-server -y
+> # 创建/var/run/sshd, 并启动sshd服务
+> # mkdir /var/run/sshd; /usr/sbin/sshd
+> # 生成秘钥文件 
+> # ssh-keygen -t dsa -f /etc/ssh/ssh_host_rsa_key
+> # ssh-keygen -t dsa -f /etc/ssh/ssh_host_ed25519_key
+> # ssh-keygen -t dsa -f /etc/ssh/ssh_host_ecdsa_key
+> # 启动sshd: /usr/sbin/sshd
+> # sed -i 's/^PermitRootLogin/#PermitRootLogin/' /etc/ssh/sshd_config
+> # echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+> # echo "root:root" | chpasswd
+> # 创建自动启动ssh服务的可执行文件run.sh, 并添加可执行权限
+> # vi /run.sh
+> # chmod +x /run.sh
+> # 内容为#! /bin/bash /usr/sbin/sshd
+> # 提交生成镜像文件
+> docker commit tsshd sshd:centos
+```
+
+
+
+
 
 
