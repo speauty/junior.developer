@@ -250,5 +250,34 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > docker run --rm -it -v ~/.bash_history:/.bash_history local-centos:76 /bin/bash
 ```
 
+##### 数据卷容器
+```bash
+> # 数据卷容器也是一个容器, 但是它的目的是专门用来提供数据卷供其他容器挂载
+
+> # 创建一个数据卷容器, 并创建一个数据卷挂载
+> # 在其他容器中使用-volumes-from可以挂载数据卷容器的数据卷
+> docker run -it -v /dbdata --name db local-centos:76 /bin/bash
+> # 创建两个挂载数据卷容器数据卷的其他容器容器
+> docker run -it --volumes-from db --name test_db1 local-centos:76 
+> docker run -it --volumes-from db --name test_db2 local-centos:76
+> # 可以多次使用--volumes-from从多个容器挂载多个数据卷. 还可以从其他已挂载的容器卷的容器来挂载数据卷
+
+> # 使用--volumes-from参数所挂载数据卷的容器自身并不需要保持在运行状态
+> # 如果删除了挂载的容器(包括db/test_db1/test_db2), 数据卷并不会被自动删除. 如果要一个数据卷, 必须在删除最后一个还挂载着它的容器时显示使用docker rm -v命令来指定同时删除关联的容器
+> # 使用数据卷容器可以让用户在容器之间自由地升级和移动数据卷
+
+> # 利用数据卷容器来迁移数据
+> # 1. 备份
+> docker run --columes-from db -v $(pwd):/backup --name worker local-centos:76 tar cvf /backup/backup.tar /dbdata
+> # $(pwd) 当前路径
+> # tar cvf 仅打包不压缩, 这里是将/dbdata目录打包到/backup/backup.tar文件中, 通过数据卷共享到本地
+
+> # 2. 恢复
+> # 先创建一个带数据卷的容器
+> docker run -v /dbdata --name db local-centos:76 /bin/bash
+> # 再创建一个新容器, 挂载db的容器, 并使用untar解压备份文件到所挂载的容器卷中
+> docker run --volumes-from db -v $(pwd):/backup busybox tar xvf /backup/backup.tar
+```
+
 
 
