@@ -454,6 +454,33 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > # CentOS和Fedora都是基于Redhat的常见Linux分支. CentOS是目前企业级服务器的常用操作系统; Fedora主要面向个人桌面用户
 ```
 
+##### 为镜像添加SSH服务
+```bash
+> # 1. 基于commit命令创建
+> docker run -it -d --name tsshd local-centos:76 /bin/bash
+> docker exec -it ContainerId /bin/bash
+> # 进入系统后, 更新yum, yum update
+> # 然后, 安装, yum install openssh-server -y
+> # 创建/var/run/sshd, 并启动sshd服务
+> # mkdir /var/run/sshd; /usr/sbin/sshd
+> # 生成秘钥文件 
+> # ssh-keygen -t dsa -f /etc/ssh/ssh_host_rsa_key
+> # ssh-keygen -t dsa -f /etc/ssh/ssh_host_ed25519_key
+> # ssh-keygen -t dsa -f /etc/ssh/ssh_host_ecdsa_key
+> # 启动sshd: /usr/sbin/sshd
+> # sed -i 's/^PermitRootLogin/#PermitRootLogin/' /etc/ssh/sshd_config
+> # echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+> # echo "root:root" | chpasswd
+> # 创建自动启动ssh服务的可执行文件run.sh, 并添加可执行权限
+> # vi /run.sh
+> # chmod +x /run.sh
+> # 内容为#! /bin/bash /usr/sbin/sshd
+> # 提交生成镜像文件
+> docker commit tsshd sshd:centos
+```
+
+
+
 
 
 
