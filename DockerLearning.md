@@ -314,5 +314,31 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > # 容器有自己的内部网络和IP地址, 使用docker inspect ContainerId可以获取容器的具体信息
 ```
 
+##### 互联机制实现便捷互访
+```bash
+> # 容器的互联是一种让多个容器中应用进行快速交互的方式
+> # 它会在源和接受容器之间创建连接关系, 接受容器可以通过容器名快速访问到源容器, 而不用指定具体的IP地址
+
+> # 1. 自定义容器命名
+> # 连接系统依据容器的名称来执行, 容器的名称是唯一的
+> # 使用--name标记可以为容器自定义命名
+> # 可以使用docker inspect -f "{{.Name}}" ContainerId来查看容器的名字
+
+> # 在执行docker run的时候如果添加--rm标记, 则容器在终止后会立刻删除. 注意, --rm和-d参数不能同时使用
+
+> # 2. 容器互联
+> # 使用--link参数可以让容器之间安全地进行交互
+> # 还是和之前操作一样, 创建一个数据库容器
+> docker run -it -d --name db local-centos:76
+> # 创建一个新的容器, 并将它连接到db容器
+> docker run -it -d -P --name web --link db:db local-centos:76
+> # --link name:alias, 其中name是要连接的容器名称, alias是这个连接的别名
+> # 使用env命令来查看web容器的环境变量
+> # 其中DB_开头的环境变量是提供web容器连接db容器使用的, 前缀采用大写的连接别名
+> # 除了环境变量外, docker还添加了host信息到父容器的/etc/hosts文件
+
+> # 用户可以连接多个子容器到父容器, 比如可以连接多个web到同一个db容器上
+```
+
 
 
