@@ -279,5 +279,40 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > docker run --volumes-from db -v $(pwd):/backup busybox tar xvf /backup/backup.tar
 ```
 
+##### docker允许映射容器内应用的服务端口到本地宿主主机
+##### 互联机制实现多个容器间通过容器名来快速访问
+
+##### 端口映射实现访问容器
+```bash
+> # 1. 从外部访问容器应用
+> # 在启动容器时, 如果不指定对应的参数, 在容器外部是无法通过网络来访问容器内的网络应用和服务的
+> # 可以通过-P或-p参数来指定端口映射, 当使用-P标记时, Docker会随机映射一个49000~49900的端口到内部容器开放的网络端口
+> # -p 可以指定要映射的端口, 并且在一个指定端口上只可以绑定一个容器, 支持的格式:
+> # IP:Hostport:ContainerPort | IP::ContainerPort | HostPort:ContainerPort
+> docker run -it -d -P --name test local-centos:76
+> docker run -it -d -p 127.0.0.1:54335:54335 --name testp local-centos:76
+> # 可以使用 docker logs -f container-name
+
+> # 2. 映射所有接口地址
+> # 使用HostPort:ContainerPort格式将本地的5000端口映射到容器的5000端口
+> docker run -it -d -p 5000:5000 --name testp local-centos:76
+> # 默认会绑定本地所有接口上的所有地址, 可多次使用-p标记绑定多个接口
+
+> # 3. 映射到指定地址的指定端口
+> # 使用IP:Hostport:ContainerPort格式指定映射使用一个特定地址
+> docker run -it -d -p 127.0.0.1:54335:54335 --name testp local-centos:76
+
+> # 4. 映射到指定地址的任意端口
+> # 使用IP::ContainerPort绑定localhost的任意端口到容器的5000端口, 本地主机会自动分配一个端口
+> docker run -it -d -p 127.0.0.1::5000 --name testp local-centos:76
+> # 还可以使用udp标记来指定udp端口
+> docker run -it -d -p 127.0.0.1::5000/udp --name testp local-centos:76
+
+> # 5. 查看端口配置
+> docker port Container-name [ContainerPort]
+
+> # 容器有自己的内部网络和IP地址, 使用docker inspect ContainerId可以获取容器的具体信息
+```
+
 
 
