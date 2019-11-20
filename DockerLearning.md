@@ -349,7 +349,7 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 > # 1. 指令说明
 > # 1.1 FROM
 > # 指定所创建镜像的基础镜像, 如果本地不存在, 则默认会去Docker Hub下载指定镜像
-> # 格式 FROM <iamge> 或 FROM <image>:<tag> 或 FROM <image>@<digest>
+> # 格式 FROM <image> 或 FROM <image>:<tag> 或 FROM <image>@<digest>
 > # 任何Dockerfile中的第一条指令必须为FROM指令. 如果在同一个Dockerfile中创建多个镜像, 可以使用多个FROM指令(每个镜像一次)
 > # 1.2 MAINTAINER
 > # 指定维护者信息, 格式为 MAINTAINER <name>, 该信息会写入生成镜像的Author属性域中
@@ -457,26 +457,47 @@ Error parsing reference: "localCentOS:76" is not a valid repository/tag: invalid
 ##### 为镜像添加SSH服务
 ```bash
 > # 1. 基于commit命令创建
-> docker run -it -d --name tsshd local-centos:76 /bin/bash
+> docker run -it -d --privileged=true --name tsshd local-centos:76 /usr/sbin/init
+> # 此处加入特权模式，否则容器中systemctl命令使用时会有D-Bus服务连接失败的报错
 > docker exec -it ContainerId /bin/bash
-> # 进入系统后, 更新yum, yum update
-> # 然后, 安装, yum install openssh-server -y
-> # 创建/var/run/sshd, 并启动sshd服务
-> # mkdir /var/run/sshd; /usr/sbin/sshd
-> # 生成秘钥文件 
-> # ssh-keygen -t dsa -f /etc/ssh/ssh_host_rsa_key
-> # ssh-keygen -t dsa -f /etc/ssh/ssh_host_ed25519_key
-> # ssh-keygen -t dsa -f /etc/ssh/ssh_host_ecdsa_key
-> # 启动sshd: /usr/sbin/sshd
-> # sed -i 's/^PermitRootLogin/#PermitRootLogin/' /etc/ssh/sshd_config
-> # echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
-> # echo "root:root" | chpasswd
-> # 创建自动启动ssh服务的可执行文件run.sh, 并添加可执行权限
-> # vi /run.sh
-> # chmod +x /run.sh
-> # 内容为#! /bin/bash /usr/sbin/sshd
-> # 提交生成镜像文件
-> docker commit tsshd sshd:centos
+> # 进入系统后, 更新yum, \
+> yum update
+> yum install openssh-server openssh-clients -y
+> vi /etc/ssh/sshd_config
+> # UsePAM yes => UsePAM no
+> # UsePAM yes => UsePAM no
+> # 注释HostKey /etc/ssh/ssh_host_ecdsa_key
+> # 注释HostKey /etc/ssh/ssh_host_ed25519_key
+> # 设置容器root用户密码
+> systemctl start sshd.service
+> systemctl enable sshd.service
+> # 处理好了,就退出, 照之前的操作提交镜像
+
+> 2. 使用Dockerfile创建
+> Dockerfile centos
+FROM centos:latest
+MAINTAINER speauty (speauty@163.com)
+RUN yum install openssh-server openssh-clients -y \
+    && yum clean all \
+    && sed -i 's/UsePAM yes/UsePAM no/g' /etc/ssh/sshd_config \
+    && sed -i 's/HostKey \/etc\/ssh\/ssh_host_ecdsa_key/#HostKey \/etc\/ssh\/ssh_host_ecdsa_key/g' /etc/ssh/sshd_config \
+    && sed -i 's/HostKey \/etc\/ssh\/ssh_host_ed25519_key/#HostKey \/etc\/ssh\/ssh_host_ed25519_key/g' /etc/ssh/sshd_config \
+    && ssh-keygen -t rsa -b 2048 -f /etc/ssh/ssh_host_rsa_key \
+    && echo "root:0000"|chpasswd
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
+
+> Dockerfile ubuntu
+FROM ubuntu:latest
+MAINTAINER speauty <speauty@163.com>
+RUN apt-get update \
+    && apt-get install -y openssh-server \
+    && mkdir -p /var/run/sshd \
+    && echo 'root:12345' | chpasswd \
+    && sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
+    && sed -ri 's/session required pam_loginuid.so/#session required pam_loginuid.so/g' /etc/pam.d/sshd
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
 ```
 
 
