@@ -34,6 +34,19 @@ Docker version 18.09.7, build 2d0083d
 
 > # 使用systemctl管理docker服务
 ```
+
+##### 免sudo使用补充
+```bash
+> # 添加docker用户组
+> sudo groupadd docker
+> # 将当前用户加入docker组
+> sudo gpasswd -a ${USER} docker
+> # 重启docker
+> sudo systemctl restart docker 或 sudo service docker restart
+> # 切换用户, 使配置生效
+> su root && su {USER}
+```
+
 ##### 获取镜像
 ```bash
 > # 从Docker Hub镜像源下载镜像
