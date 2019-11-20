@@ -498,6 +498,8 @@ RUN apt-get update \
     && sed -ri 's/session required pam_loginuid.so/#session required pam_loginuid.so/g' /etc/pam.d/sshd
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
+
+> # 更多参考 https://www.docker.com/blog/intro-guide-to-dockerfile-best-practices
 ```
 
 
