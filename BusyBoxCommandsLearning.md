@@ -167,6 +167,16 @@ Manipulate ARP cache
 地址解析协议是建立在网络中各个主机互相信任的基础上的, 局域网络上的主机可以自主发送ARP应答消息, 其他主机收到应答报文时不会检测该报文的真实性就会将其记入本机ARP缓存, 由此攻击者就可以向某一主机发送伪ARP应答报文, 使其发送的信息无法到达预期的主机或到达错误的主机, 这就构成了一个ARP欺骗
 ARP缓存中包含一个或多个表, 它们用于存储IP地址及其经过解析的MAC地址
 ARP命令用于查询本机ARP缓存中IP地址-->MAC地址的对应关系,添加或删除静态对应关系等
+
+arp
+地址                     类型    硬件地址            标志  Mask            接口
+_gateway                 ether   d0:76:e7:87:0b:2c   C                     ens133
+192.168.101.105          ether   50:8f:4c:53:90:a7   C                     ens133
+
+添加静态映射
+arp -i eth0 -s 192.168.1.6 ff:ee:ee:ee:ee:ee
+删除静态映射
+arp -i eth0 -d 192.168.1.6 ff:ee:ee:ee:ee:ee
 ```
 
 ##### 009. arping
@@ -218,4 +228,6 @@ Usage: awk [OPTIONS] [AWK_PROGRAM] [FILE]...
 echo "fasd@fasd@fasdf#" |awk -F @ "{print $1}"
 更多参考: http://www.gnu.org/software/gawk/manual/gawk.html
 ```
+
+
 
