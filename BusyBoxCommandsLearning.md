@@ -133,7 +133,7 @@ Extract or list FILES from an ar archive
 	-v	Verbose
 
 据百度百科, ar是一个备份压缩命令, 用于创建,修改备存文件(archive), 或从备存文件中提取成员文件. ar命令最常见的用法是将目标文件打包为静态链接库
-``
+```
 
 ##### 007. arch
 ```
