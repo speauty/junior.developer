@@ -185,7 +185,11 @@ Send ARP requests/replies
 	-s SRC_IP	Sender IP address
 	DST_IP		Target IP address
 
-试了一把, 不通...
+arping -f -I ens133  192.168.101.134
+ARPING 192.168.101.134 from 192.168.101.130 ens133
+Unicast reply from 192.168.101.134 [00:F1:F3:C3:01:F8]  0.716ms
+Sent 1 probes (1 broadcast(s))
+Received 1 response(s)
 ```
 
 ##### 010. ash
