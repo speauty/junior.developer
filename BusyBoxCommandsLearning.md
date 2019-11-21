@@ -34,8 +34,9 @@ Listen to ACPI events and spawn specific helpers on event arrival
 	-M FILE Map file [/etc/acpi.map]
 Accept and ignore compatibility options -g -m -s -S -v
 
-据[ARCHWIKI](https://wiki.archlinux.org/index.php/acpid), ACPID是一种灵活的, 可扩展的用于传递ACPI事件的守护进程. 当事件发生时, 它执行程序来处理事件.
+据ARCHWIKI, ACPID是一种灵活的, 可扩展的用于传递ACPI事件的守护进程. 当事件发生时, 它执行程序来处理事件.
 ```
+* ###### [acpid](https://wiki.archlinux.org/index.php/acpid)
 
 ##### 002. add-shell
 ```
@@ -84,7 +85,6 @@ test:x:1000:test
 再来看几个相关的文件
 用户文件 /etc/passwd
 test:x:1000:1000:Linux User,,,:/home/test:/bin/sh
-参考链接: https://www.jianshu.com/p/76700505cac4
 用户名:口令:用户标识号:组标识号:注释描述:主目录:默认shell
 口令: 存放着加密后的用户口令, 这个字段存放的只是用户口令的加密串, 不是明文. 但是/etc/passwd文件所有用户都可以读, 所以这是个安全隐患, 所以许多Linux版本中使用shadow技术, 把真正加密后的用户口令存放在/etc/shadow中, 而在/etc/passwd文件中用x或者*代替. 稍后, 去看一下就知道了
 UID取值范围: 通常UID的取值范围为0~65535. 0是超级用户root的标识号, 1~99由系统保留作为管理账号. 普通用户是从100开始的, 而Linux中默认是从500开始的
@@ -106,6 +106,7 @@ test:a46PaBaWc0NC2:18220:0:99999:7:::
 失效时间: 表示该用户的帐号生存期, 超过这个设定时间, 帐号失效, 用户就无法登录系统了. 如果这个字段的值为空, 帐号永久可用
 保留字段: linux的保留字段, 目前为空, 以备linux日后发展之用
 ```
+* ###### [Linux中的用户和用户组](https://www.jianshu.com/p/76700505cac4)
 
 ##### 005. adjtimex
 ```
@@ -118,9 +119,8 @@ Read or set kernel time variables. See adjtimex(2)
 	-t TICK	Microseconds per tick, usually 10000
 		(positive -t or -f values make clock run faster)
 	-p TCONST
-
-更多参考: http://www.man7.org/linux/man-pages/man2/adjtimex.2.html
 ```
+* ###### [adjtimex](http://www.man7.org/linux/man-pages/man2/adjtimex.2.html)
 
 ##### 006. ar
 ```
@@ -226,8 +226,330 @@ Usage: awk [OPTIONS] [AWK_PROGRAM] [FILE]...
 
 简单试了一下, 还是可以
 echo "fasd@fasd@fasdf#" |awk -F @ "{print $1}"
-更多参考: http://www.gnu.org/software/gawk/manual/gawk.html
+```
+* ###### [gawk](http://www.gnu.org/software/gawk/manual/gawk.html)
+
+##### 012. base64
+```
+Usage: base64 [-d] [FILE]
+Base64 encode or decode FILE to standard output
+	-d	Decode data
+
+将文件经base64加密或解密到标准输出
+echo "fdsadfs" |base64|base64 -d
+fdsadfs
 ```
 
+##### 013. basename
+```
+Usage: basename FILE [SUFFIX]
+Strip directory path and .SUFFIX from FILE
 
+将路径和后缀过滤掉, 获取文件名称
+basename test.txt
+test.txt
+basename test.txt txt
+test.
+basename test.txt .txt
+test
+```
 
+##### 014. bc
+```
+Usage: bc [-sqlw] FILE...
+Arbitrary precision calculator
+	-q	Quiet
+	-l	Load standard math library
+	-s	Be POSIX compatible
+	-w	Warn if extensions are used
+$BC_LINE_LENGTH changes output width
+
+任意精度计算器
+进入之后, 输入quit退出
+
+就当做windows下的计算器使用吧
+```
+
+##### 015. beep
+```
+Usage: beep -f FREQ -l LEN -d DELAY -r COUNT -n
+	-f	Frequency in Hz
+	-l	Length in ms
+	-d	Delay in ms
+	-r	Repetitions
+	-n	Start new tone
+
+beep -f 800 -l 125 -D 125 -r 2
+beep: can't open console
+
+尴尬了, 蜂鸣失败, 不能打开控制台
+```
+
+##### 016. blkdiscard
+```
+Usage: blkdiscard [-o OFS] [-l LEN] [-s] DEVICE
+Discard sectors on DEVICE
+	-o OFS	Byte offset into device
+	-l LEN	Number of bytes to discard
+	-s	Perform a secure discard
+
+删除设备上的扇区, 感觉也不是个随便玩的命令
+```
+* ###### [blkdiscard](http://www.linuxguruz.com/man-pages/blkdiscard/)
+
+##### 017. blkid
+```
+Usage: blkid [BLOCKDEV]...
+Print UUIDs of all filesystems
+
+输出所有文件系统的UUID, 在工作这台电脑上, 没有任何响应, 即使安装了e2fsprogs
+但是在个人PC上, 有响应, 我想起了, 工作电脑, 没分区...
+```
+
+##### 018. blockdev
+```
+Usage: blockdev OPTION BLOCKDEV
+	--setro		Set ro  设置设备为只读
+	--setrw		Set rw  设置设备为可读写
+	--getro		Get ro  读取设备是否为只读(成功为1,0则为可读写)
+	--getss		Get sector size
+	--getbsz	Get block size
+	--setbsz BYTES	Set block size
+	--getsz		Get device size in 512-byte sectors
+	--getsize64	Get device size in bytes
+	--flushbufs	Flush buffers
+	--rereadpt	Reread partition table
+从命令行调用区块设备控制程序(ioctl)
+```
+
+##### 019. bootchartd
+```
+Usage: bootchartd start [PROG ARGS]|stop|init
+Create /var/log/bootchart.tgz with boot chart data
+start: start background logging; with PROG, run PROG, then kill logging with USR1
+stop: send USR1 to all bootchartd processes
+init: start background logging; stop when getty/xdm is seen (for init scripts)
+Under PID 1: as init, then exec $bootchart_init, /init, /sbin/init
+
+应该是启动数据记录下来, 作分析使用的
+```
+
+##### 020. brctl
+```
+Usage: brctl COMMAND [BRIDGE [ARGS]]
+Manage ethernet bridges
+Commands:
+	show [BRIDGE]...	Show bridges
+	addbr BRIDGE		Create BRIDGE
+	delbr BRIDGE		Delete BRIDGE
+	addif BRIDGE IFACE	Add IFACE to BRIDGE
+	delif BRIDGE IFACE	Delete IFACE from BRIDGE
+	stp BRIDGE 1/yes/on|0/no/off	STP on/off
+	setageing BRIDGE SECONDS	Set ageing time
+	setfd BRIDGE SECONDS		Set bridge forward delay
+	sethello BRIDGE SECONDS		Set hello time
+	setmaxage BRIDGE SECONDS	Set max message age
+	setbridgeprio BRIDGE PRIO	Set bridge priority
+	setportprio BRIDGE IFACE PRIO	Set port priority
+	setpathcost BRIDGE IFACE COST	Set path cost
+
+管理以太网桥(网卡)
+brctl show 
+bridge name	bridge id		STP enabled	interfaces
+docker0		8000.024204af0bef	no		veth6ef444e
+
+激活STP
+sudo brctl stp docker0 1
+brctl show
+bridge name	bridge id		STP enabled	interfaces
+docker0		8000.024204af0bef	yes		veth6ef444e
+
+创建一个网卡
+sudo brctl addbr brtest0
+需要桥接的网卡IP清空(这不就不用了, 害怕搞砸, 直接桥接)
+sudo ifconfig eth0 0 up
+在"brtest0"上添加"ens133"
+sudo brctl addif brtest0 ens133
+给"brtest0"配置IP 192.168.101.189
+sudo ifconfig  brtest0 192.168.101.189 /24 up
+设置默认的网关地址, 这个也不用操作
+route add default gw 192.168.101.1
+顺便激活STP协议
+
+删除一波
+先解绑
+sudo brctl delif brtest0 ens133
+再网卡下线
+sudo ifconfig brtest0 down
+删除即可
+sudo brctl delbr brtest0
+
+刚把百度整丢了, 重启网络服务, 然后就可以访问百度了
+sudo service network-manager restart
+```
+* ###### [Linux STP介绍](https://www.cnblogs.com/hzl6255/p/3259909.html)
+* ###### STP(Spanning Tree Protocol)即生成树协议, 标准为[IEEE802.1D-1998](http://ylescop.free.fr/mrim/protocoles/802/802.1D-1998.pdf), 是一种二层冗余技术, 利用STA算法构建一个逻辑上没有环路的树形网络拓扑结构, 并且可以通过一定的方法实现路径冗余
+* ###### [brctl创建虚拟网卡详解](https://www.cnblogs.com/yinzhengjie/p/7446226.html)
+
+##### 021. bunzip2
+```
+Usage: bunzip2 [-cfk] [FILE]...
+Decompress FILEs (or stdin)
+	-c	Write to stdout
+	-f	Force
+	-k	Keep input files
+
+解压.bz2文件
+```
+
+##### 022. busybox
+```
+BusyBox is copyrighted by many authors between 1998-2015.
+Licensed under GPLv2. See source distribution for detailed
+copyright notices.
+Usage: busybox [function [arguments]...]
+   or: busybox --list[-full]
+   or: busybox --show SCRIPT
+   or: busybox --install [-s] [DIR]
+   or: function [arguments]...
+	BusyBox is a multi-call binary that combines many common Unix
+	utilities into a single executable.  Most people will create a
+	link to busybox for each function they wish to use and BusyBox
+	will act like whatever it was invoked as.
+Currently defined functions:
+	[, [[, acpid, add-shell, addgroup, adduser, adjtimex, ar, arch, arp, arping, ash, awk, base64, basename, bc, beep, blkdiscard, blkid, blockdev, bootchartd, brctl, bunzip2, bzcat, bzip2, cal, cat,
+	chat, chattr, chgrp, chmod, chown, chpasswd, chpst, chroot, chrt, chvt, cksum, clear, cmp, comm, conspy, cp, cpio, crond, crontab, cryptpw, cttyhack, cut, date, dc, dd, deallocvt, delgroup,
+	deluser, depmod, devmem, df, dhcprelay, diff, dirname, dmesg, dnsd, dnsdomainname, dos2unix, dpkg, dpkg-deb, du, dumpkmap, dumpleases, echo, ed, egrep, eject, env, envdir, envuidgid, ether-wake,
+	expand, expr, factor, fakeidentd, fallocate, false, fatattr, fbset, fbsplash, fdflush, fdformat, fdisk, fgconsole, fgrep, find, findfs, flock, fold, free, freeramdisk, fsck, fsck.minix, fsfreeze,
+	fstrim, fsync, ftpd, ftpget, ftpput, fuser, getopt, getty, grep, groups, gunzip, gzip, halt, hd, hdparm, head, hexdump, hexedit, hostid, hostname, httpd, hush, hwclock, i2cdetect, i2cdump,
+	i2cget, i2cset, i2ctransfer, id, ifconfig, ifdown, ifenslave, ifplugd, ifup, inetd, init, insmod, install, ionice, iostat, ip, ipaddr, ipcalc, ipcrm, ipcs, iplink, ipneigh, iproute, iprule,
+	iptunnel, kbd_mode, kill, killall, killall5, klogd, last, less, link, linux32, linux64, linuxrc, ln, loadfont, loadkmap, logger, login, logname, logread, losetup, lpd, lpq, lpr, ls, lsattr,
+	lsmod, lsof, lspci, lsscsi, lsusb, lzcat, lzma, lzop, makedevs, makemime, man, md5sum, mdev, mesg, microcom, mkdir, mkdosfs, mke2fs, mkfifo, mkfs.ext2, mkfs.minix, mkfs.vfat, mknod, mkpasswd,
+	mkswap, mktemp, modinfo, modprobe, more, mount, mountpoint, mpstat, mt, mv, nameif, nanddump, nandwrite, nbd-client, nc, netstat, nice, nl, nmeter, nohup, nologin, nproc, nsenter, nslookup, ntpd,
+	nuke, od, openvt, partprobe, passwd, paste, patch, pgrep, pidof, ping, ping6, pipe_progress, pivot_root, pkill, pmap, popmaildir, poweroff, powertop, printenv, printf, ps, pscan, pstree, pwd,
+	pwdx, raidautorun, rdate, rdev, readahead, readlink, readprofile, realpath, reboot, reformime, remove-shell, renice, reset, resize, resume, rev, rm, rmdir, rmmod, route, rpm, rpm2cpio, rtcwake,
+	run-init, run-parts, runlevel, runsv, runsvdir, rx, script, scriptreplay, sed, sendmail, seq, setarch, setconsole, setfattr, setfont, setkeycodes, setlogcons, setpriv, setserial, setsid,
+	setuidgid, sh, sha1sum, sha256sum, sha3sum, sha512sum, showkey, shred, shuf, slattach, sleep, smemcap, softlimit, sort, split, ssl_client, start-stop-daemon, stat, strings, stty, su, sulogin,
+	sum, sv, svc, svlogd, svok, swapoff, swapon, switch_root, sync, sysctl, syslogd, tac, tail, tar, taskset, tc, tcpsvd, tee, telnet, telnetd, test, tftp, tftpd, time, timeout, top, touch, tr,
+	traceroute, traceroute6, true, truncate, ts, tty, ttysize, tunctl, ubiattach, ubidetach, ubimkvol, ubirename, ubirmvol, ubirsvol, ubiupdatevol, udhcpc, udhcpc6, udhcpd, udpsvd, uevent, umount,
+	uname, unexpand, uniq, unix2dos, unlink, unlzma, unshare, unxz, unzip, uptime, users, usleep, uudecode, uuencode, vconfig, vi, vlock, volname, w, wall, watch, watchdog, wc, wget, which, who,
+	whoami, whois, xargs, xxd, xz, xzcat, yes, zcat, zcip
+
+对头, 没看错, 我就是在学这些函数
+```
+
+##### 023. bzcat
+```
+Usage: bzcat [FILE]...
+Decompress to stdout
+
+和上面那个差不多, 解压.bz2文件到标准输出
+```
+
+##### 024. bzip2
+```
+Usage: bzip2 [OPTIONS] [FILE]...
+Compress FILEs (or stdin) with bzip2 algorithm
+	-1..9	Compression level
+	-d	Decompress
+	-t	Test file integrity
+	-c	Write to stdout
+	-f	Force
+	-k	Keep input files
+
+使用bzip2算法压缩文件或标准输入
+压缩标准输出到bz2文件
+echo "fdajkdsfjkasfjklsjkdf"|bzip2 -8 > te.bz2
+压缩多文件
+bzip2 -c te.bz2 test.txt > ha.bz2
+
+bzcat te.bz2 
+fdajkdsfjkasfjklsjkdf
+bunzip2 ha.bz2 -k
+ls 
+ha      ha.bz2
+
+bzcat和bunzip2好像都是解压到同一个文件中, 所以多文件的压缩包, 解压之后, 会出现乱码
+需要其他的解压工具吧
+```
+* ###### [bzip2](http://www.bzip.org/)
+
+##### 025. cal
+```
+Usage: cal [-jy] [[MONTH] YEAR]
+Display a calendar
+	-j	Use julian dates
+	-y	Display the entire year
+
+显示日历, 挺好用的
+```
+
+##### 026. cat
+```
+Usage: cat [-nbvteA] [FILE]...
+Print FILEs to stdout
+	-n	Number output lines
+	-b	Number nonempty lines
+	-v	Show nonprinting characters as ^x or M-x
+	-t	...and tabs as ^I
+	-e	...and end lines with $
+	-A	Same as -vte
+
+将文件输出到标注输出
+cat -n test.txt 
+1	jkhf
+2	fdhsajkfhsajhjf
+```
+
+##### 027. chat
+```
+Usage: chat EXPECT [SEND [EXPECT [SEND...]]]
+Useful for interacting with a modem connected to stdin/stdout.
+A script consists of "expect-send" argument pairs.
+Example:
+chat '' ATZ OK ATD123456 CONNECT '' ogin: pppuser word: ppppass '~'
+
+这个命令...
+```
+
+##### 028. chattr
+```
+Usage: chattr [-R] [-v VERSION] [-+=AacDdijsStTu] FILE...
+Change ext2 file attributes
+	-R	Recurse
+	-v VER	Set version/generation number
+Modifiers:
+	-,+,=	Remove/add/set attributes
+Attributes:
+	A	Don't track atime
+	a	Append mode only
+	c	Enable compress
+	D	Write dir contents synchronously
+	d	Don't backup with dump
+	i	Cannot be modified (immutable)
+	j	Write all data to journal first
+	s	Zero disk storage when deleted
+	S	Write synchronously
+	t	Disable tail-merging of partial blocks with other files
+	u	Allow file to be undeleted
+
+改变存放在ext2文件系统上的文件或目录属性
+```
+
+##### 029. chgrp
+```
+Usage: chgrp [-RhLHPcvf]... GROUP FILE...
+Change the group membership of each FILE to GROUP
+	-R	Recurse
+	-h	Affect symlinks instead of symlink targets
+	-L	Traverse all symlinks to directories
+	-H	Traverse symlinks on command line only
+	-P	Don't traverse symlinks (default)
+	-c	List changed files
+	-v	Verbose
+	-f	Hide errors
+
+变更文件或目录的所属群组
+Recurse 递归
+Traverse 遍历
+```
