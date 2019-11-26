@@ -10,7 +10,63 @@
 > cd 6.0/
 > php think run
 > # 接下来, 就可以进行AB压测
-> # 可能是机子原因, QPS才1.74, 低的有些恐怖
+> # 可能是机子原因, QPS才13.15(这里修正了, 有朋友说这个太低, 然后, 我又测了一下, 数据也是尴尬的要紧), 低的有些恐怖
+
+This is ApacheBench, Version 2.3 <$Revision: 1757674 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        
+Server Hostname:        127.0.0.1
+Server Port:            8000
+
+Document Path:          /
+Document Length:        775 bytes
+
+Concurrency Level:      250
+Time taken for tests:   76.073 seconds
+Complete requests:      1000
+Failed requests:        0
+Keep-Alive requests:    0
+Total transferred:      937000 bytes
+HTML transferred:       775000 bytes
+Requests per second:    13.15 [#/sec] (mean)
+Time per request:       19018.207 [ms] (mean)
+Time per request:       76.073 [ms] (mean, across all concurrent requests)
+Transfer rate:          12.03 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0  688 3680.2      0   31616
+Processing:    70 8387 5155.5   7677   55537
+Waiting:       70 8386 5155.5   7677   55537
+Total:         99 9075 7391.4   7686   70706
+
+Percentage of the requests served within a certain time (ms)
+  50%   7686
+  66%   7914
+  75%   8065
+  80%   8106
+  90%  13159
+  95%  14843
+  98%  38776
+  99%  59141
+ 100%  70706 (longest request)
+
 ```
 
 * #### 入口文件启动相关
