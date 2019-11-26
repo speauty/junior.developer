@@ -553,3 +553,141 @@ Change the group membership of each FILE to GROUP
 Recurse 递归
 Traverse 遍历
 ```
+
+##### 030. chmod
+```
+Each MODE is one or more of the letters ugoa, one of the
+symbols +-= and one or more of the letters rwxst
+	-R	Recurse
+	-c	List changed files
+	-v	List all files
+	-f	Hide errors
+
+更改文件或目录权限
+```
+
+##### 031. chown
+```
+Usage: chown [-RhLHPcvf]... USER[:[GRP]] FILE...
+Change the owner and/or group of each FILE to USER and/or GRP
+	-R	Recurse
+	-h	Affect symlinks instead of symlink targets
+	-L	Traverse all symlinks to directories
+	-H	Traverse symlinks on command line only
+	-P	Don't traverse symlinks (default)
+	-c	List changed files
+	-v	List all files
+	-f	Hide errors
+
+更改文件或目录的所有者或所有组
+```
+
+##### 032. chpasswd
+```
+Usage: chpasswd [--md5|--encrypted|--crypt-method|--root]
+Read user:password from stdin and update /etc/passwd
+	-e,--encrypted		Supplied passwords are in encrypted form
+	-m,--md5		Encrypt using md5, not des
+	-c,--crypt-method ALG	des,md5,sha256/512 (default des)
+	-R,--root DIR		Directory to chroot into
+
+从标准输入中读取用户密码并更新/etc/passwd
+
+chpasswd 
+root:0000
+chpasswd: password for 'root' changed
+```
+
+##### 033. chpst
+```
+Change the process state, run PROG
+	-u USER[:GRP]	Set uid and gid
+	-U USER[:GRP]	Set $UID and $GID in environment
+	-e DIR		Set environment variables as specified by files
+			in DIR: file=1st_line_of_file
+	-/ DIR		Chroot to DIR
+	-n NICE		Add NICE to nice value
+	-m BYTES	Same as -d BYTES -s BYTES -l BYTES
+	-d BYTES	Limit data segment
+	-o N		Limit number of open files per process
+	-p N		Limit number of processes per uid
+	-f BYTES	Limit output file sizes
+	-c BYTES	Limit core file size
+	-v		Verbose
+	-P		Create new process group
+	-0		Close stdin
+	-1		Close stdout
+	-2		Close stderr
+```
+
+##### 034. chroot
+```
+Usage: chroot NEWROOT [PROG ARGS]
+Run PROG with root directory set to NEWROOT
+
+更改root目录来着
+```
+
+##### 035. chrt
+```
+Usage: chrt -m | -p [PRIO] PID | [-rfobi] PRIO PROG [ARGS]
+Change scheduling priority and class for a process
+	-m	Show min/max priorities
+	-p	Operate on PID
+	-r	Set SCHED_RR class
+	-f	Set SCHED_FIFO class
+	-o	Set SCHED_OTHER class
+	-b	Set SCHED_BATCH class
+	-i	Set SCHED_IDLE class
+
+更改进程的调度优先级和类
+```
+
+##### 036. chvt
+```
+Usage: chvt N
+Change the foreground virtual terminal to /dev/ttyN
+
+切换虚拟终端
+```
+
+##### 037. cksum
+```
+Usage: cksum FILE...
+Calculate the CRC32 checksums of FILEs
+
+检查文件的CRC是否正确, 确保文件从一个系统传输到另一个系统的过程中不被损坏
+```
+
+##### 038. clear
+```
+Usage: clear
+Clear screen
+
+清屏操作
+```
+
+##### 039. cmp
+```
+Usage: cmp [-l] [-s] FILE1 [FILE2 [SKIP1 [SKIP2]]]
+Compare FILE1 with FILE2 (or stdin)
+	-l	Write the byte numbers (decimal) and values (octal)
+		for all differing bytes
+	-s	Quiet
+
+比较两个文件
+```
+
+##### 040. comm
+```
+Usage: comm [-123] FILE1 FILE2
+Compare FILE1 with FILE2
+	-1	Suppress lines unique to FILE1
+	-2	Suppress lines unique to FILE2
+	-3	Suppress lines common to both files
+
+比较两个文件, 显示共有的
+-1 不显示只在文件1中出现的行
+-2 不显示只在文件2中出现的行
+-3 显示在两个文件中都出现了的行
+```
