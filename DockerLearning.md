@@ -515,7 +515,52 @@ CMD ["/usr/sbin/sshd", "-D"]
 > # 更多参考 https://www.docker.com/blog/intro-guide-to-dockerfile-best-practices
 ```
 
+##### 构建WEB服务和应用
+```bash
+> # apache
+> # 创建Dockerfile和项目目录
+FROM httpd:2.4
+COPY ./wwwroot /usr/local/apache2/htdocs/
+> docker build -t apache2-image .
+> docker run -it --rm --name apache-container -p 80:80 apache2-image
+> # 也可以不创建镜像, 直接映射目录
+> docker run -it --rm --name apache-ap -p 80:80 -v "$PWD":/usr/local/apache2/htdocs httpd:2.4
 
+> # nginx
+> # 直接使用官方镜像
+> docker run -d -p 80:80 --name nginx-server nginx
+> # 挂载本地目录
+> docker run -d --name nginx-container -p 80:80 -v index.html:/usr/share/nginx/html:ro -d nginx
+
+> # lamp/lnmp
+> # 使用linode/lamp镜像
+> docker run -p 80:80 -it linode/lamp /bin/bash
+> 进入该镜像后, 使用 service开启apache2和mysql服务
+
+> # 使用tutum/lamp镜像
+> docker run -d -p 80:80 -p 3306:3306 tutum/lamp
+
+> # CMS-WordPress
+> docker pull wordpress
+> docker run -d --name my-wordpress --link local-mysql:mysql wordpress
+> 使用compose搭建wordpress应用
+> 新建docker-compose.yml
+wordpress:
+    image: wordpress
+    links:
+        -db:mysql
+    ports:
+        -8080:80
+db:
+    image: mariadb
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+> docker-compose up
+> # 如果没有docker-compose可使用pip install docker-compose
+
+CMS-Ghost
+> docker run --name ghost-container -d -p 80:2368 ghost
+```
 
 
 
