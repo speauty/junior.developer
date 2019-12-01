@@ -562,6 +562,32 @@ CMS-Ghost
 > docker run --name ghost-container -d -p 80:2368 ghost
 ```
 
+##### 持续开发与管理
+```bash
+> # 持续集成(Continuous integration, CI)
+> # 集成通过自动化的构建来完成, 包括自动编译, 发布和测试, 从而尽快的发现错误
+> # 特点: 从检出代码, 编译构建, 运行测试, 结果记录, 测试统计等都是自动完成的, 减少人工干预.
+> # 需要有持续集成系统的支持, 包括代码托管机制支持, 以及集成服务器等
+
+> # 持续交付(Continuous delivery CD): 强调产品在修改后到部署上线的流程要敏捷化, 自动化
+
+> # Jenkins 开放易用的持续集成平台
+> # 实时监控集成中存在的错误, 提供详细的日志文件和提醒功能, 并用图标的形式形象的展示项目构建的趋势和稳定性
+> # 特点: 安装配置简单, 支持详细的测试报表, 分布式构建等
+> # 使用官方发布的docker镜像一键部署
+> docker run -p 8080:8080 -p 5000:5000 jenkins
+
+> # Gitlab 开源源码管理系统
+> # 支持基于GIT的源码管理, 代码评测, issue跟踪, 活动管理, wiki页面, 持续集成和测试等功能
+> # 使用官方提供的社区dockerhub镜像
+docker run --detack --hostname gitlab.example.com --publish 443:443 --publish 80:80 --publish 23:23 --name gitlab \
+--restart always \
+--volumn /srv/gitlab/config:/etc/gitlab \
+--volumn /srv/gitlab/logs:/var/log/gitlab \
+--volumn /srv/gitlab/data:/var/opt/gitlab \
+gitlab/gitlab-ce:latest
+
+```
 
 
 
