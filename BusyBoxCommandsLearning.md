@@ -691,3 +691,151 @@ Compare FILE1 with FILE2
 -2 不显示只在文件2中出现的行
 -3 显示在两个文件中都出现了的行
 ```
+
+##### 041. conspy
+```
+Usage: conspy [-vcsndfFQ] [-x COL] [-y LINE] [CONSOLE_NO]
+A text-mode VNC like program for Linux virtual consoles.
+To exit, quickly press ESC 3 times.
+	-v	Don't send keystrokes to the console
+	-c	Create missing /dev/{tty,vcsa}N
+	-s	Open a SHELL session
+	-n	Black & white
+	-d	Dump console to stdout
+	-f	Follow cursor
+	-F	Assume console is on a framebuffer device
+	-Q	Disable exit on ESC-ESC-ESC
+	-x COL	Starting column
+	-y LINE	Starting line
+```
+###### 更多参考[conspy](http://conspy.sourceforge.net/)
+
+##### 042. cp
+```
+Copy SOURCE(s) to DEST
+	-a	Same as -dpR
+	-R,-r	Recurse
+	-d,-P	Preserve symlinks (default if -R)
+	-L	Follow all symlinks
+	-H	Follow symlinks on command line
+	-p	Preserve file attributes if possible
+	-f	Overwrite
+	-i	Prompt before overwrite
+	-l,-s	Create (sym)links
+	-T	Treat DEST as a normal file
+	-u	Copy only newer files
+
+这个命令也是经常用到, 拷贝文件目录什么的
+```
+
+##### 043. cpio
+```
+Usage: cpio [-dmvu] [-F FILE] [-R USER[:GRP]] [-H newc] [-tio] [-p DIR] [EXTR_FILE]...
+Extract (-i) or list (-t) files from a cpio archive, or
+take file list from stdin and create an archive (-o) or copy files (-p)
+Main operation mode:
+	-t	List
+	-i	Extract EXTR_FILEs (or all)
+	-o	Create (requires -H newc)
+	-p DIR	Copy files to DIR
+Options:
+	-H newc	Archive format
+	-d	Make leading directories
+	-m	Preserve mtime
+	-v	Verbose
+	-u	Overwrite
+	-F FILE	Input (-t,-i,-p) or output (-o) file
+	-R USER[:GRP]	Set owner of created files
+	-L	Dereference symlinks
+	-0	Input is separated by NULs
+
+从cpio档案中提取文件列表? 或者将标准输入获取文件列表并创建一个档案, 或拷贝文件?
+```
+
+##### 044. crond
+```
+Usage: crond -fbS -l N -d N -L LOGFILE -c DIR
+	-f	Foreground
+	-b	Background (default)
+	-S	Log to syslog (default)
+	-l N	Set log level. Most verbose 0, default 8
+	-d N	Set log level, log to stderr
+	-L FILE	Log to FILE
+	-c DIR	Cron dir. Default:/var/spool/cron/crontabs
+
+定期执行命令或者指定程序任务的一种服务或者软件
+```
+
+##### 045. crontab
+```
+Usage: crontab [-c DIR] [-u USER] [-ler]|[FILE]
+	-c	Crontab directory
+	-u	User
+	-l	List crontab
+	-e	Edit crontab
+	-r	Delete crontab
+	FILE	Replace crontab by FILE ('-': stdin)
+minute   hour   day   month   week   command
+```
+
+##### 046. cryptpw
+```
+Usage: cryptpw [OPTIONS] [PASSWORD] [SALT]
+Print crypt(3) hashed PASSWORD
+	-P,--password-fd N	Read password from fd N
+	-m,--method TYPE	des,md5,sha256/512 (default des)
+	-S,--salt SALT
+打印密码的crypt哈希值
+```
+
+##### 047. cttyhack
+```
+Usage: cttyhack [PROG ARGS]
+
+Give PROG a controlling tty if possible.
+Example for /etc/inittab (for busybox init):
+	::respawn:/bin/cttyhack /bin/sh
+Giving controlling tty to shell running with PID 1:
+	$ exec cttyhack sh
+Starting interactive shell from boot shell script:
+	setsid cttyhack sh
+控制终端
+```
+
+##### 048. cut
+```
+Usage: cut [OPTIONS] [FILE]...
+Print selected fields from each input FILE to stdout
+	-b LIST	Output only bytes from LIST
+	-c LIST	Output only characters from LIST
+	-d CHAR	Use CHAR instead of tab as the field delimiter
+	-s	Output only the lines containing delimiter
+	-f N	Print only these fields
+	-n	Ignored
+打印来自标准输出每行中指定的部分
+```
+
+##### 049. date
+```
+Usage: date [OPTIONS] [+FMT] [TIME]
+Display time (using +FMT), or set time
+	[-s,--set] TIME	Set time to TIME
+	-u,--utc	Work in UTC (don't convert to local time)
+	-R,--rfc-2822	Output RFC-2822 compliant date string
+	-I[SPEC]	Output ISO-8601 compliant date string
+			SPEC='date' (default) for date only,
+			'hours', 'minutes', or 'seconds' for date and
+			time to the indicated precision
+	-r,--reference FILE	Display last modification time of FILE
+	-d,--date TIME	Display TIME, not 'now'
+	-D FMT		Use FMT (strptime format) for -d TIME conversion
+
+Recognized TIME formats:
+	hh:mm[:ss]
+	[YYYY.]MM.DD-hh:mm[:ss]
+	YYYY-MM-DD hh:mm[:ss]
+	[[[[[YY]YY]MM]DD]hh]mm[.ss]
+	'date TIME' form accepts MMDDhhmm[[YY]YY][.ss] instead
+
+显示时间, 或设置时间
+```
