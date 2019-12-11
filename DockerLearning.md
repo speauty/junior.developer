@@ -586,8 +586,87 @@ docker run --detack --hostname gitlab.example.com --publish 443:443 --publish 80
 --volumn /srv/gitlab/logs:/var/log/gitlab \
 --volumn /srv/gitlab/data:/var/opt/gitlab \
 gitlab/gitlab-ce:latest
-
 ```
+
+##### 临时更正, 现在改有ubuntu18.04系统, 之前大部分在deepin系统上操作的, 特此, 说明一下.
+
+##### 进行到了数据库应用, 主要包括关系型和非关系型两种数据库
+
+##### 数据库应用-MySQL
+```
+> # 使用官方镜像快速启动一个MySQL实例
+> docker run --name mysql_one -e MYSQL_ROOT_PASSWORD=0000 -d mysql:latest
+> # 上面这个只是配置了ROOT密码
+
+> # 将官方MySQL镜像作为客户端使用
+> docker run -it --rm mysql mysql -hhost -uuser -p
+
+> # 查看MySQL日志
+> docker logs mysql_one
+
+> # 自定义配置文件, 采用挂载目录实现
+> docker run --name mysql-exp -v /home/user/mysql_cnf:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=your_passwd -d mysql:tag
+
+> # 脱离cnf文件进行配置
+> # 通过标签(flags)将配置选项传入mysqld进程, 用户可脱离配置文件对容器进行弹性定制
+> docker run --name mysql-exp -e MYSQL_ROOT_PASSWORD=0000 -d mysql:tag --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+> # 查看可用选项的完整列表: docker run -it --rm mysql:tag --verbose --help
+
+> 主机访问的话, 最好做个端口映射, -p
+```
+
+##### 数据库应用-MongoDB: 可扩展/高性能 文档数据库 C++开发 支持复杂的数据类型和强大的查询语言
+```
+> # 从官方镜像创建容器
+> docker run --name mongo-test -d mongo
+
+> # 启动bash
+> docker exec -it container-id sh
+> # 使用mongo指令启动mongodb交互命令行
+> # env 可查看环境变量配置, 默认暴露了mongodb的服务端口: 27017
+
+> # 连接mongodb容器
+> docker run -it --link mongo-test:db alpine sh
+> # 进入后, 可使用ping db 测试mongo容器的连通性
+
+> 直接使用mongo cli指令
+> docker run -it --link mongo-test:test --entrypoint mongo mongo --host db
+
+> # 可以使用--storageEngine设置储存引擎
+> docker run --name mongo-test -d mongo --storageEngine wiredTiger
+
+> 利用环境变量指定密码或无密码访问
+> docker run -d -p 27017:27917 -e MONGODB_PASS="0000" mongo
+> docker run -d -p 27017:27917 -e AUTH=no mongo
+```
+
+##### 数据库应用-Redis: 开源的基于内存的数据结构存储系统 ANSI C实现, 可以用作数据库/缓存/消息中间件
+```
+> # 通过官方镜像创建容器
+> docker run -d --name redis-test redis
+
+> # 连接redis容器
+> docker run -it --link redis-test:db alpine sh
+> # 可使用nc指令检测redis服务可用性: nc db 6379
+
+> # 使用redis客户端
+> docker run -it --link redis-test:db --entrypoint redis-cli redis -h db
+
+> # 使用自定义配置还是通过挂载数据卷实现的, 目的路径: /usr/local/etc/redis/redis.cnf
+> # 启动时需要指定配置文件
+```
+
+##### 数据库应用-Memcached: 高性能/分布式的开源内存对象缓存系统
+```
+# Memcached守护进程基于C语言实现, 基于libevent的事件处理可以实现很高的性能. 由于数据仅存在于内存中, 因此重启memcached或重启操作系统会导致数据全部丢失.
+
+> docker run -d --name memcached-test memcached
+> # 可以指定内存使用量
+> docker run -d --name memcached-test -2-d memcached memcached -m 64
+
+> # 用户可在宿主机上直接telnet测试访问memcached容器. 并直接输入客户端命令
+```
+
 
 
 
