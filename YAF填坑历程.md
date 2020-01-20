@@ -4,25 +4,27 @@
 
 先把官方链接放出来, 点击[YAF](http://www.laruence.com/manual/)可快速跳转至官方手册, 其他参考的链接就放在下面, 开始小白的填坑之旅.
 
+哦, 对了, 对应代码仓库地址: [https://github.com/speauty/YAFPitProject](https://github.com/speauty/YAFPitProject)
+
 * #### 安装YAF框架
-  1. 下载安装包, 并解压
+  1 下载安装包, 并解压
   ```shell script
   > wget http://pecl.php.net/get/yaf-3.0.9.tgz
   > tar -zxf yaf-3.0.9.tgz
    ```
-  2. 编译安装YAF
+  2 编译安装YAF
   ```shell script
   > cd yaf-3.0.9
   > /usr/local/php/phpize
   > ./configure --with-php-config=/usr/local/php/bin/php-config
   > sudo make && sudo make install
   ```
-  3. 在`php.ini`配置YAF扩展
+  3 在`php.ini`配置YAF扩展
   ```shell script
   > sudo vim /usr/local/php/lib/php.ini
   > # 加上extension=yaf, 然后保存退出即可
   ```
-  4. 检测YAF扩展是否配置
+  4 检测YAF扩展是否配置
   ```shell script
   > php --ri=yaf
   
@@ -51,8 +53,52 @@
   # 开启的情况下, Yaf将会使用命名空间方式注册自己的类, 比如Yaf_Application将会变成Yaf\Application
   yaf.use_namespace => Off => Off 
   ```
-  5. 到这里, YAF也算安装完毕, 其中配置项的注释源于YAF文档.
+  5 到这里, YAF也算安装完毕, 其中配置项的注释源于YAF文档
 
+* #### 按文档尝试
+   1 先来梳理项目结构
+   ```shell script
+   + public
+     |- index.php //入口文件
+     |- .htaccess //重写规则    
+     |+ css
+     |+ img
+     |+ js
+   + conf
+     |- application.ini //配置文件   
+   + application
+     |+ controllers
+        |- Index.php //默认控制器
+     |+ views    
+        |+ index   //控制器
+           |- index.phtml //默认视图
+     |+ modules //其他模块
+     |+ library //本地类库
+     |+ models  //model目录
+     |+ plugins //插件目录
+  
+  # 是不是很是眼熟? 没错, 就是官网拷贝过来的, 和原生写法组织目录差不多, 不过这里把类库和插件都在放在应用那层目录下, 要我说, 又得单独提到根目录, 估计也是受TP框架的影响.
+   ```
+  2 配置nginx虚拟站点
+  ```shell script
+  server {
+    listen 88;
+    # root该使用绝对路径
+    root   ~/GitSelf/YAFPitProject/public;
+    index  index.php index.html index.htm;
+    include php73.conf;
+    if (!-e $request_filename) {
+      rewrite ^/(.*)  /index.php/$1 last;
+    }
+    access_log  /var/log/wwwlogs/local.yaf.com.log;
+    error_log  /var/log/wwwlogs/local.yaf.com.error.log;
+  }
+  ```
+  3 最后小结一下
+    * 默认是index模块, 访问地址http://127.0.0.1:88/模块(index模块可省略)/控制器/方法名
+    * 配置
 
 * ##### 参考链接
-   1. [YAF框架入门教程](https://www.jianshu.com/p/1460d2296f19)
+   * [YAF框架入门教程](https://www.jianshu.com/p/1460d2296f19)
+   * [如果使自己的文件也使用namespace](https://github.com/laruence/yaf/issues/159)
+   * [phpstorm配置yaf提示](https://segmentfault.com/q/1010000003851803)
